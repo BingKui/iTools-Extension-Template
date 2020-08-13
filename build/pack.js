@@ -35,7 +35,7 @@ function readDir(obj, nowPath) {
 //开始压缩文件
 function compressFolder(name) {
     const folderPath = path.resolve(__dirname, '../dist');
-    const targetPath = path.resolve(__dirname, `../dist/${name}.tar`);
+    const targetPath = path.resolve(__dirname, `../dist/${name}.zip`);
     readDir(zip, folderPath);
     zip.generateAsync({ //设置压缩格式，开始打包
         type: 'nodebuffer', //nodejs用
