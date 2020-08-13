@@ -12,6 +12,12 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 module.exports = webpackMerge(webpackBase, {
     mode: 'production',
+    output: {
+        publicPath: './',
+        filename: 'js/[name].js',
+        path: path.resolve(__dirname, '../dist'),
+        chunkFilename: '[id].js'
+    },
     module: {
         rules: [
             {

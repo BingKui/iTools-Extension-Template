@@ -7,12 +7,6 @@ module.exports = {
     entry: {
         index: path.resolve(__dirname, '../src/index.js'),
     },
-    output: {
-        publicPath: './',
-        filename: 'js/[name].js',
-        path: path.resolve(__dirname, '../dist'),
-        chunkFilename: '[id].js'
-    },
     module: {
         rules: [
             {

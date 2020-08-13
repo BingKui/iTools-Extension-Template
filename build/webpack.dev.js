@@ -4,6 +4,12 @@ const webpackMerge = require('webpack-merge');
 
 module.exports = webpackMerge(webpackBase, {
     mode: 'development',
+    output: {
+        publicPath: '/',
+        filename: 'js/[name].js',
+        path: path.resolve(__dirname, '../dist'),
+        chunkFilename: '[id].js'
+    },
     module: {
         rules: [
             {
