@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const webpackBase = require('./webpack.base.js');
 const webpackMerge = require('webpack-merge');
 
@@ -9,47 +10,6 @@ module.exports = webpackMerge(webpackBase, {
         filename: 'js/[name].js',
         path: path.resolve(__dirname, '../dist'),
         chunkFilename: '[id].js'
-    },
-    module: {
-        rules: [
-            {
-                test: /\.css$/,
-                exclude: /node_modules/,
-                use: [
-                    'vue-style-loader',
-                    'css-loader',
-                    'postcss-loader',
-                ]
-            },
-            {
-                test: /\.less$/,
-                exclude: /node_modules/,
-                use: [
-                    'vue-style-loader',
-                    'css-loader',
-                    'postcss-loader',
-                    'less-loader',
-                    {
-                        loader: 'sass-resources-loader',
-                        options: {
-                            resources: path.resolve(__dirname, '../src/styles/var.less'),
-                        }
-                    },
-                ]
-            },
-            {
-                test: /\.(js|vue)$/,
-                enforce: 'pre', // 强制先进行 ESLint 检查
-                exclude: /node_modules/,
-                loader: 'eslint-loader',
-                options: {
-                    // 启用自动修复
-                    fix: true,
-                    // 启用警告信息
-                    emitWarning: true,
-                }
-            },
-        ]
     },
     devServer: {
         contentBase: path.resolve(__dirname, '../dist'),
@@ -69,4 +29,11 @@ module.exports = webpackMerge(webpackBase, {
             // },
         },
     },
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.env': {
+                'ENV': JSON.stringify('dev'),
+            },
+        }),
+    ],
 });

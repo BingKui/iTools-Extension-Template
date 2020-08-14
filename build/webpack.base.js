@@ -1,7 +1,16 @@
 const path = require('path');
+// html 插件
 const HTMLWebpackPlugin = require('html-webpack-plugin');
+// vue loader 插件
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
+// 文件 copy 插件
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+// 抽取css
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// 优化输入信息插件
+const FirendlyErrorePlugin = require('friendly-errors-webpack-plugin');
+
+const isProd = process.env.ENV === 'prod';
 
 module.exports = {
     entry: {
@@ -13,6 +22,12 @@ module.exports = {
                 test: /\.vue$/, // 处理vue模块
                 use: [{
                     loader: 'vue-loader',
+                    options: {
+                        extractCSS: isProd,
+                        loaders: {
+                            less: 'vue-style-loader!css-loader!postcss-loader!less-loader',
+                        },
+                    },
                 }],
             },
             {
@@ -23,30 +38,77 @@ module.exports = {
                         loader: 'babel-loader',
                         options: {
                             cacheDirectory: true,
-                            presets: ['@babel/preset-env'],
-                        }
-                    }
+                        },
+                    },
                 ]
             },
             {
-                test: /\.(png|svg|jpg|gif)$/, // 处理图片
+                test: /\.css$/,
+                use: [
+                    isProd ? MiniCssExtractPlugin.loader : 'vue-style-loader',
+                    'css-loader',
+                    'postcss-loader',
+                ]
+            },
+            {
+                test: /\.less$/,
+                use: [
+                    isProd ? MiniCssExtractPlugin.loader : 'vue-style-loader',
+                    'css-loader',
+                    'postcss-loader',
+                    {
+                        loader: 'less-loader',
+                        options: {
+                            javascriptEnabled: true,
+                        },
+                    },
+                    {
+                        loader: 'sass-resources-loader',
+                        options: {
+                            resources: path.resolve(__dirname, '../src/styles/var.less'),
+                        }
+                    },
+                ]
+            },
+            {
+                test: /\.(js|vue)$/,
+                enforce: 'pre', // 强制先进行 ESLint 检查
+                exclude: /node_modules/,
+                loader: 'eslint-loader',
+                options: {
+                    // 启用自动修复
+                    fix: true,
+                    // 启用警告信息
+                    emitWarning: true,
+                }
+            },
+            {
+                test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
                 use: {
-                    loader: 'file-loader', // 解决打包css文件中图片路径无法解析的问题
-                    options: {
-                        // 打包生成图片的名字
-                        name: '[name].[ext]',
-                        // 图片的生成路径
-                        outputPath: 'img',
-                        publicPath: 'img',
+                    loader: 'url-loader',
+                    query: {
+                        limit: 10000,
+                        publicPath: '../',
+                        name: '[folder]/[name].[ext]'
                     }
                 }
             },
             {
-                test: /\.(woff|woff2|eot|ttf|otf)$/, // 处理字体
+                test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+                loader: 'url-loader',
+                options: {
+                    limit: 10000,
+                    name: '[folder]/[name].[ext]'
+                }
+            },
+            {
+                test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
                 use: {
-                    loader: 'file-loader',
-                    options: {
-                        outputPath: 'font',
+                    loader: 'url-loader',
+                    query: {
+                        limit: 10000,
+                        publicPath: '../',
+                        name: '[folder]/[name].[ext]'
                     }
                 }
             },
@@ -71,6 +133,7 @@ module.exports = {
     },
     plugins: [
         new VueLoaderPlugin(),
+        new FirendlyErrorePlugin(),
         new CopyWebpackPlugin([{
             from: path.resolve(__dirname, '../public'),
             to: path.resolve(__dirname, '../dist'),
