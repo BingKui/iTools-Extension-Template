@@ -2,7 +2,7 @@
     <router-view />
 </template>
 <script>
-// import '@styles/main.less';
+import '@styles/main.less';
 export default {
     name: 'index',
 };
